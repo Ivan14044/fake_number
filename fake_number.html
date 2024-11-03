@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Number Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            padding: 40px;
+        }
+        .container {
+            max-width: 600px;
+            background: #ffffff;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h2 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        button {
+            width: 100%;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f1f1f1;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2><i class="fas fa-phone"></i> Phone Number Generator</h2>
+        <label for="country" class="form-label">Select Country:</label>
+        <select id="country" class="form-select">
+            <option value="all">All Countries</option>
+            <option value="us">United States</option>
+            <option value="uk">United Kingdom</option>
+            <option value="de">Germany</option>
+            <option value="fr">France</option>
+            <option value="ca">Canada</option>
+            <option value="au">Australia</option>
+            <option value="in">India</option>
+            <option value="br">Brazil</option>
+            <option value="cn">China</option>
+            <option value="jp">Japan</option>
+            <option value="ru">Russia</option>
+            <option value="mx">Mexico</option>
+            <option value="it">Italy</option>
+            <option value="es">Spain</option>
+            <option value="za">South Africa</option>
+            <option value="kr">South Korea</option>
+            <option value="tr">Turkey</option>
+            <option value="nl">Netherlands</option>
+            <option value="se">Sweden</option>
+            <option value="ch">Switzerland</option>
+            <option value="ar">Argentina</option>
+            <option value="sa">Saudi Arabia</option>
+            <option value="pl">Poland</option>
+            <option value="id">Indonesia</option>
+            <option value="ng">Nigeria</option>
+            <option value="eg">Egypt</option>
+            <option value="th">Thailand</option>
+            <option value="my">Malaysia</option>
+            <option value="vn">Vietnam</option>
+        </select>
+
+        <label for="count" class="form-label">Number of phone numbers to generate:</label>
+        <input type="number" id="count" class="form-control" min="1" max="100" value="1">
+
+        <button class="btn btn-primary mt-3" onclick="generateNumbers()"><i class="fas fa-random"></i> Generate</button>
+
+        <div id="result" class="mt-4"></div>
+    </div>
+
+    <script>
+        const countryData = {
+            'us': { code: '+1', operators: ['201', '202', '203'], length: 10 },
+            'uk': { code: '+44', operators: ['20', '7300', '7500'], length: 10 },
+            'de': { code: '+49', operators: ['151', '152', '160'], length: 11 },
+            'fr': { code: '+33', operators: ['6', '7'], length: 9 },
+            'ca': { code: '+1', operators: ['416', '647', '778'], length: 10 },
+            'au': { code: '+61', operators: ['4'], length: 9 },
+            'in': { code: '+91', operators: ['98', '99', '97'], length: 10 },
+            'br': { code: '+55', operators: ['11', '21', '31'], length: 11 },
+            'cn': { code: '+86', operators: ['130', '131', '132'], length: 11 },
+            'jp': { code: '+81', operators: ['70', '80', '90'], length: 10 },
+            'ru': { code: '+7', operators: ['901', '902', '903'], length: 10 },
+            'mx': { code: '+52', operators: ['55', '81', '33'], length: 10 },
+            'it': { code: '+39', operators: ['3'], length: 10 },
+            'es': { code: '+34', operators: ['6', '7'], length: 9 },
+            'za': { code: '+27', operators: ['60', '61', '71'], length: 9 },
+            'kr': { code: '+82', operators: ['10', '11'], length: 10 },
+            'tr': { code: '+90', operators: ['501', '505', '506'], length: 10 },
+            'nl': { code: '+31', operators: ['6'], length: 9 },
+            'se': { code: '+46', operators: ['70', '73'], length: 9 },
+            'ch': { code: '+41', operators: ['78', '79'], length: 9 },
+            'ar': { code: '+54', operators: ['11', '15'], length: 10 },
+            'sa': { code: '+966', operators: ['50', '55'], length: 9 },
+            'pl': { code: '+48', operators: ['50', '51', '53'], length: 9 },
+            'id': { code: '+62', operators: ['811', '812'], length: 10 },
+            'ng': { code: '+234', operators: ['802', '803', '808'], length: 10 },
+            'eg': { code: '+20', operators: ['10', '11'], length: 10 },
+            'th': { code: '+66', operators: ['8', '9'], length: 9 },
+            'my': { code: '+60', operators: ['10', '11', '12'], length: 9 },
+            'vn': { code: '+84', operators: ['3', '7', '8'], length: 9 }
+        };
+
+        function generateNumbers() {
+            const country = document.getElementById('country').value;
+            const count = parseInt(document.getElementById('count').value);
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+            let allNumbers = [];
+
+            if (country === 'all') {
+                for (let key in countryData) {
+                    const countryNumbers = generateCountryNumbers(key, count);
+                    resultDiv.innerHTML += `<h3>${key.toUpperCase()} Numbers:</h3>`;
+                    resultDiv.innerHTML += countryNumbers.join('<br>') + '<br><br>';
+                    allNumbers = allNumbers.concat(countryNumbers);
+                }
+            } else {
+                const countryNumbers = generateCountryNumbers(country, count);
+                resultDiv.innerHTML += countryNumbers.join('<br>');
+                allNumbers = countryNumbers;
+            }
+
+            downloadNumbers(allNumbers);
+        }
+
+        function generateCountryNumbers(country, count) {
+            const numbers = [];
+            const { code, operators, length } = countryData[country];
+
+            for (let i = 0; i < count; i++) {
+                const operator = operators[Math.floor(Math.random() * operators.length)];
+                const remainingLength = length - operator.length;
+                let number = '';
+                for (let j = 0; j < remainingLength; j++) {
+                    number += Math.floor(Math.random() * 10);
+                }
+                const fullNumber = code + operator + number;
+                if (isValidNumber(country, fullNumber)) {
+                    numbers.push(fullNumber);
+                }
+            }
+
+            return numbers;
+        }
+
+        function isValidNumber(country, number) {
+            const regexPatterns = {
+                'us': /^\+1[2-9]\d{2}[2-9](?!11)\d{6}$/,  // Пример: номера США начинаются с +1, далее идет трехзначный код и номер
+                'uk': /^\+44[2378]\d{8,9}$/,
+                'de': /^\+49(151|152|160)\d{7}$/,
+                'fr': /^\+33[67]\d{8}$/,
+                // Добавьте другие страны, если необходимо
+            };
+            return regexPatterns[country] ? regexPatterns[country].test(number) : true;
+        }
+
+        function downloadNumbers(numbers) {
+            const blob = new Blob([numbers.join('\n')], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = 'phone_numbers.txt';
+            link.click();
+        }
+    </script>
+</body>
+</html>
